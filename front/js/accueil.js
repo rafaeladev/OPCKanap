@@ -1,6 +1,6 @@
 //Récupérer les données de l'API
 
-fetch("http://localhost:3000/api/products")
+const addCanapData = () => fetch("http://localhost:3000/api/products")
     .then((response) => response.json())
     .then((data) => {
             //Affichage des elements dans le DOM
@@ -38,4 +38,10 @@ fetch("http://localhost:3000/api/products")
             }
     }
 )  
-.catch (err => console.log("Oh no",err))    
+    .catch (err => console.log("Oh no",err))    
+
+const main = async () => {
+    await addCanapData()
+}
+
+main()
