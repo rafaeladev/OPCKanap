@@ -8,7 +8,7 @@ fetch("http://localhost:3000/api/products")
             for(let i = 0; i < data.length; i++) {
                 const article = data[i];
                 // Récupération de l'élément du DOM qui accueillera les itemss
-                const sectionItems = document.querySelector('#items');
+                const sectionItems = document.getElementById('items');
 
                 //Link
                 const linkCanap = document.createElement("a")
@@ -33,21 +33,9 @@ fetch("http://localhost:3000/api/products")
 
                     //Description
                     const descriptionCanap = document.createElement("p");
-                    descriptionCanap.innerText = article.description ?? "Pas de description pour le moment.";
+                    descriptionCanap.textContent = article.description ?? "Pas de description pour le moment.";
                     articleCanap.appendChild(descriptionCanap);
             }
     }
-);        
-
-
-const fetchPromise = fetch("http://localhost:3000/api/products");
-fetchPromise.then(response => {
-  console.log(response);
-});
-
-const fetchPromise2 = fetch("http://localhost:3000/api/products");
-fetchPromise2.then(response => {
-  return response.json();
-}).then(people => {
-  console.log(people);
-});
+)  
+.catch (err => console.log("Oh no",err))    
