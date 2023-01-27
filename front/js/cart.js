@@ -140,10 +140,12 @@ function afficherArticle (articleAPI,itemPanier){
 // Fonction pour supprimer un produit du panier
 function supprimerProduit(click) {
     let produitCible = click.target.closest('article');
-
+    console.log(articlesPanier);
+    
     // On filtre le produit en fonction de son id et sa couleur dans le localStorage et puis on le suprimme
-    articlesPanier = articlesPanier.filter(article => article.id !== produitCible.dataset.id && article.couleur !== produitCible.dataset.color);
-    localStorage.setItem("produits", JSON.stringify(articlesPanier));
+    articlesPanier = articlesPanier.filter(article => article.id !== produitCible.dataset.id || article.couleur !== produitCible.dataset.color);
+    console.log(typeof articlesPanier, articlesPanier);
+    localStorage.setItem("produits", JSON.stringify(articlesPanier)); //tableau d'objets
 
     alert("Le produit a été supprimé");
     window.location.reload();

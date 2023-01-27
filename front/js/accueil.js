@@ -4,7 +4,7 @@ const addCanapData = () => fetch("http://localhost:3000/api/products")
     .then((response) => response.json())
     .then((data) => {
             //Affichage des elements dans le DOM
-            //console.log (data)
+            //console.log (typeof data, data)
             for(let i = 0; i < data.length; i++) {
                 const article = data[i];
                 // Récupération de l'élément du DOM qui accueillera les itemss
