@@ -115,11 +115,53 @@ function afficherArticle (articleAPI,itemPanier){
              settingsCanap.appendChild(deleteCanap);
  
                  //Item supprimer
-                 const bouttonSupprimer = document.createElement("p");
+                 const bouttonSupprimer = document.createElement('p');
                  bouttonSupprimer.className = "deleteItem";
                  bouttonSupprimer.textContent = 'Supprimer';
                  deleteCanap.appendChild(bouttonSupprimer);
+
+    
+    // --- Modification Panier
+    let bouttonsSupprimer = document.getElementsByClassName('deleteItem');
+    let quantiteInputs = document.getElementsByClassName('itemQuantity');
+             
+
+    // On appelle les fonctions lors du clic ou changement de l'input
+    for (let button of bouttonsSupprimer) {
+        button.addEventListener("click", supprimerProduit);
+    }
+
+    for (let input of quantiteInputs) {
+        input.addEventListener("change", changerQuantiteProduit);
+    }
+    
 }
+
+// Fonction pour supprimer un produit du panier
+function supprimerProduit(click) {
+    let produitCible = click.target.closest('article');
+
+    // On filtre le produit en fonction de son id et sa couleur dans le localStorage et puis on le suprimme
+    articlesPanier = articlesPanier.filter(article => article.id !== produitCible.dataset.id && article.couleur !== produitCible.dataset.color);
+    localStorage.setItem("produits", JSON.stringify(articlesPanier));
+
+    alert("Le produit a été supprimé");
+    window.location.reload();
+}
+
+// Fonction pour modifier la quantité d'un produit dans le panier
+function changerQuantiteProduit(click) {
+    let produitCible = click.target.closest("article");
+    let quantiteModifie = click.target.closest(".itemQuantity");
+
+    // On filtre le produit en fonction de son id et sa couleur dans le localStorage et puis on remplace sa quantité
+    let produitTrouve = articlesPanier.find(article => article.id == produitCible.dataset.id && article.couleur == produitCible.dataset.color);
+    let nouvelleQuantite = parseInt(quantiteModifie.value);
+    produitTrouve.quantite = nouvelleQuantite;
+    localStorage.setItem("produits", JSON.stringify(produitTrouve));
+
+}
+
 
 
 collecteDonneesAPI();
