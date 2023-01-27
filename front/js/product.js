@@ -41,17 +41,15 @@ function produitDetails ()
                     }
                 }
         )
-        .catch (err => console.log("Oh no",err))  
+        .catch ((error) => {
+            let sectionItem = document.querySelector(".item");
+            sectionItem.textContent = "Pas de produit trouvé";
+        })  
 }
 
 // ------- Ajouter le canapé au panier -------
 
-function ajoutPanier () {
-    //Selection du boutton dans le DOM
-    let ajoutPanier = document.querySelector("#addToCart");
-
-    //Execution de l'action au clique de la souris
-    ajoutPanier.addEventListener("click", function () {
+function ajoutPanier (produitsLocal) {
 
         //Création de l'objet produit à ajouter au panier
         let ajoutProduitPanier = {
@@ -71,46 +69,44 @@ function ajoutPanier () {
             return;
             
         }
-    
-        //Cration de l'array (tableau) pour les produits du panier
-        //let produitsPanier = [];
 
-        //On récupère les données du localStorage
-        //window.localStorage.clear ("produits");
-        let produitsLocal = window.localStorage.getItem("produits");
+        let produitsPanier = [];
 
         //Verifier s'il y a dejà le même produit avec la même couleur et le même ID
-        if (produitsLocal !== null) {
+        if (produitsLocal !== null ) {
             produitsLocal = JSON.parse(produitsLocal);
             for (i = 0 ; i < produitsLocal.length; i++){
                 if (produitsLocal[i].id === searchId && produitsLocal[i].couleur === ajoutProduitPanier.couleur) {
                     produitsLocal[i].quantite += parseInt(ajoutProduitPanier.quantite);
-                    produitAjoute = JSON.stringify(produitsLocal[i])
-                    localStorage.setItem("produits", produitAjoute);
-                }
+                    return produitsLocal
+                } 
             }
             produitsLocal.push(ajoutProduitPanier);
-            produitsLocal = JSON.stringify(produitsLocal);
-            localStorage.setItem("produits", produitsLocal);
+            return produitsLocal
 
-            console.log("=======")
-            console.log(produitsLocal)
-            console.log("=======")
         } else {
+            let produitsLocal = [];
             produitsLocal.push(ajoutProduitPanier);
-            produitsLocal = JSON.stringify(produitsLocal);
-            localStorage.setItem("produits", produitsPanier);
-
-            console.log("+++++++")
-            console.log(window.localStorage.getItem("produits"))
-            console.log("+++++++")
+            return produitsLocal;
         }
-        alert ('Produit ajouté au Panier')
-    });
 }
 
 function main () {
-    ajoutPanier();
+    //Selection du boutton dans le DOM
+    let bouttonAjoutPanier = document.querySelector("#addToCart");
+    //Execution de l'action au clique de la souris
+    bouttonAjoutPanier.addEventListener("click", function () {
+        //On récupère les données du localStorage
+        //window.localStorage.clear ("produits");
+        let produitsLocal = localStorage.getItem("produits");
+
+       let tableauProduits = ajoutPanier(produitsLocal);
+
+        tableauProduits = JSON.stringify(tableauProduits)
+        localStorage.setItem("produits", tableauProduits);
+        alert ('Produit ajouté au Panier')
+    });
+
 }
 
 produitDetails();
