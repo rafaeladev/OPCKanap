@@ -53,11 +53,12 @@ function ajoutPanier (){
     //Execution de l'action au clique de la souris
     bouttonAjoutPanier.addEventListener("click", function () {
         //window.localStorage.clear ("produits");
-        var produitsLocal = JSON.parse(localStorage.getItem("produits"));
+        var produitsLocal = new Array();
+        produitsLocal = JSON.parse(localStorage.getItem("produits"));
         console.log(typeof produitsLocal, produitsLocal);
 
         //Création de l'objet produit à ajouter au panier
-        let ajoutProduitPanier = {
+        const ajoutProduitPanier = {
             id : searchId,
             quantite : parseInt(document.querySelector("#quantity").value),
             couleur : document.querySelector("#colors").value

@@ -1,5 +1,6 @@
 //On récupère les données du localStorage
-let articlesPanier = window.localStorage.getItem("produits");
+var articlesPanier = new Array();
+articlesPanier = window.localStorage.getItem("produits");
 articlesPanier = JSON.parse(articlesPanier);
 
 
@@ -160,11 +161,64 @@ function changerQuantiteProduit(click) {
     let produitTrouve = articlesPanier.find(article => article.id == produitCible.dataset.id && article.couleur == produitCible.dataset.color);
     let nouvelleQuantite = parseInt(quantiteModifie.value);
     produitTrouve.quantite = nouvelleQuantite;
-    localStorage.setItem("produits", JSON.stringify(produitTrouve));
+    localStorage.setItem("produits", JSON.stringify(articlesPanier));
+    window.location.reload();
+}
+
+function passerCommande (){
+    const formCommande = document.querySelector(".cart__order__form");
+    //const emailRegExp = new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]{2,50}+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[?:\.[a-zA-Z0-9-]+]{2,50}$");
+    //const textRegExp = new RegExp("^[a-zéèçàA-Z0-9.-_ ]{2,50}$");
+
+    //Evenemment lorsqu'on clique sur le boutton commander
+    formCommande.order.addEventListener("click", (click) => {
+        click.preventDefault();
+
+        const orderId = [];
+        for (let produit of articlesPanier) {
+            orderId.push(produit.id);
+        }
+        console.log (orderId);
+
+        // Création du objet avec els infos pour la commande
+        const commande = {
+            contact: {
+                firstName: formCommande.firstName.value,
+                lastName: formCommande.lastName.value,
+                address: formCommande.address.value,
+                city: formCommande.city.value,
+                email: formCommande.email.value
+            },
+            products: orderId
+        };
+
+        // La definition du corps pour la méthode Fetch Post pour le stockage de la commande
+        let contenuFetch = {
+            method: 'POST',
+            body: JSON.stringify(commande),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+
+        fetch("http://localhost:3000/api/products/order", contenuFetch)
+            .then((response) => {
+                return response.json();
+            })
+            .then ((commander) => {
+                console.log(commander);
+                console.log(commander.orderId);
+                //window.localStorage.clear ("produits");
+                document.location.href = `./confirmation.html?orderId=${commander.orderId}`;
+            })
+            .catch ((error) => {
+                alert("Des soucis ont eté rencontrés pour connecter à l'API", error);
+            })  
+    })
 
 }
 
 
-
 collecteDonneesAPI();
+passerCommande();
 
