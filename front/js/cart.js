@@ -8,7 +8,10 @@ articlesPanier = JSON.parse(articlesPanier);
 
 
 async function collecteDonneesAPI () {
-
+    //Encerrer la fonction s'il n'y a aps d'articles dans le panier
+    if (articlesPanier == null) {
+        return
+    }
     // Initilisation de la quantité et prix total
     let prixTotal = 0;
     let quantiteTotale = 0;
@@ -165,10 +168,97 @@ function changerQuantiteProduit(click) {
     window.location.reload();
 }
 
+// Fonction pour vérifier la validité des textes envoyé dans le formulaire
+function validerTexte(textToValidate) {
+
+    //Définitions de la reg exp pour les textes
+    const texteRegExp = new RegExp('^[A-Za-z-_ ]{3,30}$', 'g');
+
+    //Récupération de l'élement du DOM pour contenir le message d'erreur
+    const messageErreur = textToValidate.nextElementSibling;
+
+    // Vérification du contenu du texte
+    if(texteRegExp.test(textToValidate.value)) {
+        messageErreur.textContent = '';
+        return true;
+        
+    }else{
+        messageErreur.textContent = `${textToValidate.id} pas valide`;
+        return false;
+    };
+}
+
+// Fonction pour vérifier la validité du email envoyé dans le formulaire
+function validerEmail(emailToValidate) {
+
+    //Définiton de la reg exp pour les emails
+    const emailRegExp = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$', 'g');
+    
+    //Récupération de l'élement du DOM pour contenir le message d'erreur
+    const messageErreur = emailToValidate.nextElementSibling;
+
+    // Vérification du contenu du email
+    if(emailRegExp.test(emailToValidate.value)) {
+        messageErreur.textContent = '';
+        return true;
+        
+    }else{
+        messageErreur.textContent = `${emailToValidate.id} pas valide`;
+        return false;
+    };
+}
+
 function passerCommande (){
+
+    //Encerrer la fonction s'il n'y a aps d'articles dans le panier
+    if (articlesPanier == null) {
+        return
+    }
+
+    //Récupération de l'élement formulaire dans le DOM
     const formCommande = document.querySelector(".cart__order__form");
-    //const emailRegExp = new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]{2,50}+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[?:\.[a-zA-Z0-9-]+]{2,50}$");
-    //const textRegExp = new RegExp("^[a-zéèçàA-Z0-9.-_ ]{2,50}$");
+    
+    //------- DEBUT : Gestion de la validité du contenu du formulaire -------//
+
+    //----Contrôle du prénom
+    //Récuperation du imput Prénom
+    const lePrenom = formCommande.firstName;
+
+    lePrenom.addEventListener('change', function() {
+        //Appel de la fonction de validation
+        validerTexte(this);
+
+    });
+
+    //----Contrôle du nom
+    //Récuperation du imput Nom
+    const leNom = formCommande.lastName;
+
+    leNom.addEventListener('change', function() {
+        //Appel de la fonction de validation
+        validerTexte(this);
+    });
+
+    //----Contrôle de la Ville
+    //Récuperation du imput Ville
+    const laVille = formCommande.city;
+
+    laVille.addEventListener('change', function() {
+        //Appel de la fonction de validation
+        validerTexte(this);
+    });
+
+    //----Contrôle du email
+    //Récuperation du imput Email
+    const leMail = formCommande.email;
+
+    leMail.addEventListener('change', function() {
+        //Appel de la fonction de validation
+        validerEmail(this);
+    });
+    
+    //------- FIN : Gestion de la validité du contenu du formulaire -------//
+
 
     //Evenemment lorsqu'on clique sur le boutton commander
     formCommande.order.addEventListener("click", (click) => {
@@ -181,7 +271,7 @@ function passerCommande (){
         console.log (orderId);
 
         // Création du objet avec els infos pour la commande
-        const commande = {
+        const nouvelleCommande = {
             contact: {
                 firstName: formCommande.firstName.value,
                 lastName: formCommande.lastName.value,
@@ -192,28 +282,36 @@ function passerCommande (){
             products: orderId
         };
 
-        // La definition du corps pour la méthode Fetch Post pour le stockage de la commande
-        let contenuFetch = {
-            method: 'POST',
-            body: JSON.stringify(commande),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
+        //Gestion de la validation du formulaire
+        if(validerTexte(lePrenom) && validerTexte(leNom) &&
+        validerTexte(laVille) && validerEmail(leMail) && (nouvelleCommande.products.length > 0))
+        {
+            // La definition du corps pour la méthode Fetch Post pour le stockage de la commande
+            let optionsFetch = {
+                method: 'POST',
+                body: JSON.stringify(nouvelleCommande),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            };
 
-        fetch("http://localhost:3000/api/products/order", contenuFetch)
-            .then((response) => {
-                return response.json();
-            })
-            .then ((commander) => {
-                console.log(commander);
-                console.log(commander.orderId);
-                //window.localStorage.clear ("produits");
-                document.location.href = `./confirmation.html?orderId=${commander.orderId}`;
-            })
-            .catch ((error) => {
-                alert("Des soucis ont eté rencontrés pour connecter à l'API", error);
-            })  
+            fetch("http://localhost:3000/api/products/order", optionsFetch)
+                .then((response) => {
+                    return response.json();
+                })
+                .then ((commander) => {
+                    console.log(commander);
+                    console.log(commander.orderId);
+                    //window.localStorage.clear ("produits");
+                    document.location.href = `./confirmation.html?orderId=${commander.orderId}`;
+                })
+                .catch ((error) => {
+                    alert("Des soucis ont eté rencontrés pour connecter à l'API", error);
+                })  
+
+        }else{
+            alert('Le formulaire est incorrect');
+        };
     })
 
 }

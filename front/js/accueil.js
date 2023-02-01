@@ -38,7 +38,11 @@ const addCanapData = () => fetch("http://localhost:3000/api/products")
             }
     }
 )  
-    .catch (err => console.log("Oh no",err))    
+    .catch ((error) => {
+        // Récupération de l'élément du DOM qui accueillera les itemss
+        const sectionItems = document.getElementById('items');
+        sectionItems.textContent = "ERREUR : Aucun produit n'a été trouvé depuis l'API";
+    })    
 
 const main = async () => {
     await addCanapData()
