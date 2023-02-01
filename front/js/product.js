@@ -44,7 +44,8 @@ function detailsProduit ()
         .catch ((error) => {
             let sectionItem = document.querySelector(".item");
             sectionItem.textContent = "Pas de produit trouvé";
-        })  
+            console.log("error:" + error);
+        }); 
 }
 
 function ajoutPanier (){
@@ -62,29 +63,29 @@ function ajoutPanier (){
             id : searchId,
             quantite : parseInt(document.querySelector("#quantity").value),
             couleur : document.querySelector("#colors").value
-        }
+        };
 
         //Vérification des conditions pour ajout au panier
         if (ajoutProduitPanier.couleur == "") {
-            alert ('Vous devez choisir une couleur')
+            alert ("Vous devez choisir une couleur");
             return ;
 
         } 
         if (ajoutProduitPanier.quantite <= 0 || ajoutProduitPanier.quantite > 100) {
-            alert ('Vous devez une quantité comprise entre 1 et 100!')
+            alert ("Vous devez une quantité comprise entre 1 et 100!");
             return;
             
         }
 
         //Vérification du tableau localStorage
         if (produitsLocal !== null){
-            for (i = 0 ; i < produitsLocal.length; i++){
+            for (let i = 0 ; i < produitsLocal.length; i++){
                 if (produitsLocal[i].id === searchId && produitsLocal[i].couleur === ajoutProduitPanier.couleur) {
                     produitsLocal[i].quantite += parseInt(ajoutProduitPanier.quantite);
-                    produitsLocal = JSON.stringify(produitsLocal)
+                    produitsLocal = JSON.stringify(produitsLocal);
                     localStorage.setItem("produits", produitsLocal);
-                    alert ('Produit ajouté au Panier')
-                    return
+                    alert ("Produit ajouté au Panier");
+                    return;
                 } 
             }
             produitsLocal.push(ajoutProduitPanier);
@@ -95,9 +96,9 @@ function ajoutPanier (){
             console.log(typeof produitsLocal, produitsLocal);
         }
 
-        produitsLocal = JSON.stringify(produitsLocal)
+        produitsLocal = JSON.stringify(produitsLocal);
         localStorage.setItem("produits", produitsLocal);
-        alert ('Produit ajouté au Panier')
+        alert ("Produit ajouté au Panier");
 
     });
 }
