@@ -169,7 +169,7 @@ function changerQuantiteProduit(click) {
 }
 
 // Fonction pour vérifier la validité des textes envoyé dans le formulaire
-function validerTexte(textToValidate) {
+function validerTexte(textToValidate, text) {
 
     //Définitions de la reg exp pour les textes
     const texteRegExp = new RegExp("^[A-Za-z-_ ]{3,30}$", "g");
@@ -183,7 +183,24 @@ function validerTexte(textToValidate) {
         return true;
         
     }else{
-        messageErreur.textContent = `${textToValidate.id} pas valide`;
+        messageErreur.textContent = `Format ${text} pas valide`;
+        return false;
+    }
+}
+
+// Fonction pour vérifier la validité de l'adresse envoyée dans le formulaire
+function validerAdresse(textToValidate, text) {
+
+    //Récupération de l'élement du DOM pour contenir le message d'erreur
+    const messageErreur = textToValidate.nextElementSibling;
+
+    // Vérification de la quantité de caractères du texte
+    if(textToValidate.value.length < 40) {
+        messageErreur.textContent = "";
+        return true;
+        
+    }else{
+        messageErreur.textContent = `${text} est trop longue (plus de 40 caractères)`;
         return false;
     }
 }
@@ -203,7 +220,7 @@ function validerEmail(emailToValidate) {
         return true;
         
     }else{
-        messageErreur.textContent = `${emailToValidate.id} pas valide`;
+        messageErreur.textContent = `Format ${emailToValidate.id} pas valide`;
         return false;
     }
 }
@@ -223,10 +240,9 @@ function passerCommande (){
     //----Contrôle du prénom
     //Récuperation du imput Prénom
     const lePrenom = formCommande.firstName;
-
     lePrenom.addEventListener("change", function() {
         //Appel de la fonction de validation
-        validerTexte(this);
+        validerTexte(this, "du Prénom");
 
     });
 
@@ -236,7 +252,16 @@ function passerCommande (){
 
     leNom.addEventListener("change", function() {
         //Appel de la fonction de validation
-        validerTexte(this);
+        validerTexte(this, "du Nom");
+    });
+
+    //----Contrôle de l'adresse'
+    //Récuperation du imput Ville
+    const lAdresse = formCommande.address;
+
+    lAdresse.addEventListener("change", function() {
+        //Appel de la fonction de validation
+        validerAdresse(this, "L'adresse");
     });
 
     //----Contrôle de la Ville
@@ -245,7 +270,7 @@ function passerCommande (){
 
     laVille.addEventListener("change", function() {
         //Appel de la fonction de validation
-        validerTexte(this);
+        validerTexte(this, "de la Ville");
     });
 
     //----Contrôle du email
@@ -254,7 +279,7 @@ function passerCommande (){
 
     leMail.addEventListener("change", function() {
         //Appel de la fonction de validation
-        validerEmail(this);
+        validerEmail(this, "du Mail");
     });
     
     //------- FIN : Gestion de la validité du contenu du formulaire -------//
@@ -300,10 +325,9 @@ function passerCommande (){
                     return response.json();
                 })
                 .then ((commander) => {
-                    console.log(commander);
                     console.log(commander.orderId);
-                    //window.localStorage.clear ("produits");
-                    document.location.href = `./confirmation.html?orderId=${commander.orderId}`;
+                        window.localStorage.clear ("produits");
+                        document.location.href = `./confirmation.html?orderId=${commander.orderId}`;
                 })
                 .catch ((error) => {
                     alert("Des soucis ont eté rencontrés pour connecter à l'API", error);
