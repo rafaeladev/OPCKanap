@@ -2,106 +2,113 @@
 let searchParams = new URLSearchParams(window.location.search);
 let searchId = searchParams.get("id");
 
-// Faire une request à l'API du canapé avec l'ID souhaité
-function detailsProduit () 
-{
+/**
+ * Récupère dans l'API les données d'un canapé à partir d'un ID donnée
+ */
+function productDetails() {
     fetch(`http://localhost:3000/api/products/${searchId}`)
         .then((response) => response.json())
         .then((article) => {
-            //Affichage des elements du produit dans le DOM
+            //-------Affichage des elements du produit dans le DOM
 
-                //Titre de la page
-                document.title = `Produit : ${article.name}`;
+            //Titre de la page
+            document.title = `Produit : ${article.name}`;
 
-                //Definition du contenu d'un article
-                    //Image
-                    const imageProduct = document.createElement("img");
-                    imageProduct.src = article.imageUrl;
-                    imageProduct.alt = article.altTxt;
-                    document.querySelector(".item__img").appendChild(imageProduct);
+            //Definition du contenu d'un article
+            //Image
+            const productImage = document.createElement("img");
+            productImage.src = article.imageUrl;
+            productImage.alt = article.altTxt;
+            document.querySelector(".item__img").appendChild(productImage);
 
-                    //Nom et price
-                    const nomProduct = document.getElementById("title");
-                    const priceProduct = document.getElementById("price");
+            //Nom et price
+            const productName = document.getElementById("title");
+            const productPrice = document.getElementById("price");
 
-                    nomProduct.textContent = article.name;
-                    priceProduct.textContent = article.price;
+            productName.textContent = article.name;
+            productPrice.textContent = article.price;
 
-                    //Description
-                    const descriptionProduct = document.getElementById("description");
-                    descriptionProduct.textContent = article.description;
+            //Description
+            const productDescription = document.getElementById("description");
+            productDescription.textContent = article.description;
 
-                    //Couleurs
-                    const colorsProduct = document.getElementById("colors");
-                    for (let i = 0; i < article.colors.length; i++) {
-                        let colorsProductOption = document.createElement("option");
-                        colorsProductOption.textContent = article.colors[i];
-                        colorsProductOption.value = article.colors[i];
-                        colorsProduct.appendChild(colorsProductOption);
-                    }
-                }
-        )
-        .catch ((error) => {
+            //Couleurs
+            const productColors = document.getElementById("colors");
+            for (let i = 0; i < article.colors.length; i++) {
+                let productColorsOption = document.createElement("option");
+                productColorsOption.textContent = article.colors[i];
+                productColorsOption.value = article.colors[i];
+                productColors.appendChild(productColorsOption);
+            }
+        })
+        .catch((error) => {
+            // Récupération de l'élément du DOM qui accueillera les itemss
             let sectionItem = document.querySelector(".item");
+
+            // Affichage de la message d'erreur
             sectionItem.textContent = "Pas de produit trouvé";
             console.log("error:" + error);
-        }); 
+        });
 }
 
-function ajoutPanier (){
+/**
+ * Récupère les données d'un produit -ID, quantité et couleur- et l'ajoute au LocalStorage
+ */
+function addToCart() {
     //Selection du boutton dans le DOM
-    let bouttonAjoutPanier = document.querySelector("#addToCart");
+    let addToCartButton = document.querySelector("#addToCart");
     //Execution de l'action au clique de la souris
-    bouttonAjoutPanier.addEventListener("click", function () {
-        //window.localStorage.clear ("produits");
-        var produitsLocal = new Array();
-        produitsLocal = JSON.parse(localStorage.getItem("produits"));
-        console.log(typeof produitsLocal, produitsLocal);
+    addToCartButton.addEventListener("click", function () {
+        //window.localStorage.clear("produits");
+        var localStorageProducts = new Array();
+        localStorageProducts = JSON.parse(localStorage.getItem("products"));
+        console.log(typeof localStorageProducts, localStorageProducts);
 
         //Création de l'objet produit à ajouter au panier
-        const ajoutProduitPanier = {
-            id : searchId,
-            quantite : parseInt(document.querySelector("#quantity").value),
-            couleur : document.querySelector("#colors").value
+        const addProductToCart = {
+            id: searchId,
+            quantity: parseInt(document.querySelector("#quantity").value),
+            color: document.querySelector("#colors").value,
         };
 
         //Vérification des conditions pour ajout au panier
-        if (ajoutProduitPanier.couleur == "") {
-            alert ("Vous devez choisir une couleur");
-            return ;
-
-        } 
-        if (ajoutProduitPanier.quantite <= 0 || ajoutProduitPanier.quantite > 100) {
-            alert ("Vous devez une quantité comprise entre 1 et 100!");
+        if (addProductToCart.color == "") {
+            alert("Vous devez choisir une couleur");
             return;
-            
+        }
+        if (addProductToCart.quantity <= 0 || addProductToCart.quantity > 100) {
+            alert("Vous devez une quantité comprise entre 1 et 100!");
+            return;
         }
 
         //Vérification du tableau localStorage
-        if (produitsLocal !== null){
-            for (let i = 0 ; i < produitsLocal.length; i++){
-                if (produitsLocal[i].id === searchId && produitsLocal[i].couleur === ajoutProduitPanier.couleur) {
-                    produitsLocal[i].quantite += parseInt(ajoutProduitPanier.quantite);
-                    produitsLocal = JSON.stringify(produitsLocal);
-                    localStorage.setItem("produits", produitsLocal);
-                    alert ("Produit ajouté au Panier");
+        if (localStorageProducts !== null) {
+            for (let i = 0; i < localStorageProducts.length; i++) {
+                if (
+                    localStorageProducts[i].id === searchId &&
+                    localStorageProducts[i].color === addProductToCart.color
+                ) {
+                    localStorageProducts[i].quantity += parseInt(
+                        addProductToCart.quantity
+                    );
+                    localStorageProducts = JSON.stringify(localStorageProducts);
+                    localStorage.setItem("products", localStorageProducts);
+                    alert("Produit ajouté au Panier");
                     return;
-                } 
+                }
             }
-            produitsLocal.push(ajoutProduitPanier);
-
-        }else {
-            var produitsLocal = new Array();
-            produitsLocal.push(ajoutProduitPanier);
-            console.log(typeof produitsLocal, produitsLocal);
+            localStorageProducts.push(addProductToCart);
+        } else {
+            var localStorageProducts = new Array();
+            localStorageProducts.push(addProductToCart);
+            console.log(typeof localStorageProducts, localStorageProducts);
         }
 
-        produitsLocal = JSON.stringify(produitsLocal);
-        localStorage.setItem("produits", produitsLocal);
-        alert ("Produit ajouté au Panier");
-
+        localStorageProducts = JSON.stringify(localStorageProducts);
+        localStorage.setItem("products", localStorageProducts);
+        alert("Produit ajouté au Panier");
     });
 }
 
-detailsProduit ();
-ajoutPanier ();
+productDetails();
+addToCart();

@@ -3,28 +3,31 @@ var cartItems = new Array();
 cartItems = window.localStorage.getItem("products");
 cartItems = JSON.parse(cartItems);
 
+/**
+ * Récupère le prix d'un produit dans l'API à partir des données du LocalStorage
+ */
 async function datafromAPI() {
     //Encerrer la fonction s'il n'y a aps d'articles dans le panier
     if (cartItems == null) {
         return;
     }
-    // Initilisation de la quantité et prix total
-    let prixTotal = 0;
-    let quantiteTotale = 0;
+    // Initilisation de la quantité et prix totaux
+    let totalPrice = 0;
+    let totalQuantity = 0;
 
     for (let i = 0; i < cartItems.length; i++) {
-        quantiteTotale += cartItems[i].quantite;
+        totalQuantity += cartItems[i].quantity;
 
         await fetch(`http://localhost:3000/api/products/${cartItems[i].id}`)
             .then((response) => {
                 return response.json();
             })
             .then((articleAPI) => {
-                prixTotal =
-                    prixTotal + articleAPI.price * cartItems[i].quantite;
+                totalPrice =
+                    totalPrice + articleAPI.price * cartItems[i].quantity;
 
                 // Affichage de l'article dans la page
-                addProductPanier(articleAPI, cartItems[i]);
+                showProductInCart(articleAPI, cartItems[i]);
             })
             .catch((err) => {
                 console.log(
@@ -37,14 +40,23 @@ async function datafromAPI() {
     }
 
     // Affichage sur la page de la quantité totale et du prix total
-    const totalQuantity = document.getElementById("totalQuantity");
-    totalQuantity.textContent = quantiteTotale;
-    const totalPrice = document.getElementById("totalPrice");
-    totalPrice.textContent = prixTotal;
+    const totalQuantityDiv = document.getElementById("totalQuantity");
+    totalQuantityDiv.textContent = totalQuantity;
+    const totalPriceDiv = document.getElementById("totalPrice");
+    totalPriceDiv.textContent = totalPrice;
 }
 
-//Function pour afficher l'article dans le panier
-function addProductPanier(articleAPI, itemPanier) {
+/**
+ * Affiche les produits dans le panier
+ * @param { Object } apiArticle.id
+ * @param { Object } apiArticle.imageUrl
+ * @param { Object } apiArticle.altTxt
+ * @param { Object } apiArticle.price
+ * @param { Object } localStorageArticle.id
+ * @param { Object } localStorageArticle.color
+ * @param { Object } localStorageArticle.quantite
+ */
+function showProductInCart(apiArticle, localStorageArticle) {
     // Récupération de l'élément du DOM qui accueillera les itemss
     const sectionItems = document.querySelector("#cart__items");
     //sectionItems.innerHTML = "";
@@ -52,103 +64,105 @@ function addProductPanier(articleAPI, itemPanier) {
     // Création d’une balise article dédiée à un canap
     const articleItem = document.createElement("article");
     articleItem.className = "cart__item";
-    articleItem.setAttribute("data-id", itemPanier.id);
-    articleItem.setAttribute("data-color", itemPanier.couleur);
+    articleItem.setAttribute("data-id", localStorageArticle.id);
+    articleItem.setAttribute("data-color", localStorageArticle.color);
     sectionItems.appendChild(articleItem);
 
     //Definition du contenu d'un article
     //Image
-    const divImageCanap = document.createElement("div");
-    divImageCanap.className = "cart__item__img";
-    articleItem.appendChild(divImageCanap);
+    const canapImageDiv = document.createElement("div");
+    canapImageDiv.className = "cart__item__img";
+    articleItem.appendChild(canapImageDiv);
 
-    const imageCanap = document.createElement("img");
-    imageCanap.src = articleAPI.imageUrl;
-    imageCanap.alt = articleAPI.altTxt;
-    divImageCanap.appendChild(imageCanap);
+    const canapImage = document.createElement("img");
+    canapImage.src = apiArticle.imageUrl;
+    canapImage.alt = apiArticle.altTxt;
+    canapImageDiv.appendChild(canapImage);
 
     //Content
-    const contentCanap = document.createElement("div");
-    contentCanap.className = "cart__item__content";
-    articleItem.appendChild(contentCanap);
+    const canapContent = document.createElement("div");
+    canapContent.className = "cart__item__content";
+    articleItem.appendChild(canapContent);
 
     //Nom
-    const nomCanap = document.createElement("h2");
-    nomCanap.textContent = articleAPI.name;
-    contentCanap.appendChild(nomCanap);
+    const canapName = document.createElement("h2");
+    canapName.textContent = apiArticle.name;
+    canapContent.appendChild(canapName);
 
     //Couleur
-    const couleurCanap = document.createElement("p");
-    couleurCanap.textContent = itemPanier.couleur;
-    contentCanap.appendChild(couleurCanap);
+    const canapColor = document.createElement("p");
+    canapColor.textContent = localStorageArticle.color;
+    canapContent.appendChild(canapColor);
 
     //Prix
-    const prixCanap = document.createElement("p");
-    prixCanap.textContent = articleAPI.price + "€";
-    contentCanap.appendChild(prixCanap);
+    const canapPrice = document.createElement("p");
+    canapPrice.textContent = apiArticle.price + "€";
+    canapContent.appendChild(canapPrice);
 
     //Settings
-    const settingsCanap = document.createElement("div");
-    settingsCanap.className = "cart__item__content__settings";
-    articleItem.appendChild(settingsCanap);
+    const canapSettings = document.createElement("div");
+    canapSettings.className = "cart__item__content__settings";
+    articleItem.appendChild(canapSettings);
 
     //Quantité
-    const quantiteCanap = document.createElement("div");
-    quantiteCanap.className = "cart__item__content__settings__quantity";
-    settingsCanap.appendChild(quantiteCanap);
+    const canapQuantity = document.createElement("div");
+    canapQuantity.className = "cart__item__content__settings__quantity";
+    canapSettings.appendChild(canapQuantity);
 
     // Quantité text
-    const quantiteText = document.createElement("p");
-    quantiteText.textContent = "Qté : ";
-    quantiteCanap.appendChild(quantiteText);
+    const titleQuantity = document.createElement("p");
+    titleQuantity.textContent = "Qté : ";
+    canapQuantity.appendChild(titleQuantity);
 
     // Quantité Input
-    const quantiteInput = document.createElement("input");
-    quantiteInput.value = itemPanier.quantite;
-    quantiteInput.className = "itemQuantity";
-    quantiteInput.setAttribute("type", "number");
-    quantiteInput.setAttribute("min", "1");
-    quantiteInput.setAttribute("max", "100");
-    quantiteInput.setAttribute("name", "itemQuantity");
-    quantiteCanap.appendChild(quantiteInput);
+    const inputQuantity = document.createElement("input");
+    inputQuantity.value = localStorageArticle.quantity;
+    inputQuantity.className = "itemQuantity";
+    inputQuantity.setAttribute("type", "number");
+    inputQuantity.setAttribute("min", "1");
+    inputQuantity.setAttribute("max", "100");
+    inputQuantity.setAttribute("name", "itemQuantity");
+    canapQuantity.appendChild(inputQuantity);
 
     //Delete
-    const deleteCanap = document.createElement("div");
-    deleteCanap.className = "cart__item__content__settings__delete";
-    settingsCanap.appendChild(deleteCanap);
+    const canapDelete = document.createElement("div");
+    canapDelete.className = "cart__item__content__settings__delete";
+    canapSettings.appendChild(canapDelete);
 
     //Item supprimer
-    const bouttonSupprimer = document.createElement("p");
-    bouttonSupprimer.className = "deleteItem";
-    bouttonSupprimer.textContent = "Supprimer";
-    deleteCanap.appendChild(bouttonSupprimer);
+    const deleteButton = document.createElement("p");
+    deleteButton.className = "deleteItem";
+    deleteButton.textContent = "Supprimer";
+    canapDelete.appendChild(deleteButton);
 
     // --- Modification Panier
-    let bouttonsSupprimer = document.getElementsByClassName("deleteItem");
-    let quantiteInputs = document.getElementsByClassName("itemQuantity");
+    let allDeleteButtons = document.getElementsByClassName("deleteItem");
+    let allQuantityInputs = document.getElementsByClassName("itemQuantity");
 
     // On appelle les fonctions lors du clic ou changement de l'input
-    for (let button of bouttonsSupprimer) {
-        button.addEventListener("click", supprimerProduit);
+    for (let button of allDeleteButtons) {
+        button.addEventListener("click", deleteProduct);
     }
 
-    for (let input of quantiteInputs) {
-        input.addEventListener("change", changerQuantiteProduit);
+    for (let input of allQuantityInputs) {
+        input.addEventListener("change", updateProductQuantity);
     }
 }
 
-// Fonction pour supprimer un produit du panier
-function supprimerProduit(click) {
-    let produitCible = click.target.closest("article");
+/**
+ * Supprime un produit du panier à partir du click sur le boutton supprimer
+ */
+function deleteProduct(click) {
+    let searchedProduct = click.target.closest("article");
 
     // On filtre le produit en fonction de son id et sa couleur dans le localStorage et puis on le suprimme
     cartItems = cartItems.filter(
         (article) =>
-            article.id !== produitCible.dataset.id ||
-            article.couleur !== produitCible.dataset.color
+            article.id !== searchedProduct.dataset.id ||
+            article.color !== searchedProduct.dataset.color
     );
 
-    localStorage.setItem("produits", JSON.stringify(cartItems)); //tableau d'objets
+    localStorage.setItem("products", JSON.stringify(cartItems)); //tableau d'objets
 
     alert("Le produit a été supprimé");
     window.location.reload();
@@ -156,59 +170,73 @@ function supprimerProduit(click) {
     //collecteDonneesAPI();
 }
 
-// Fonction pour modifier la quantité d'un produit dans le panier
-function changerQuantiteProduit(click) {
-    let produitCible = click.target.closest("article");
-    let quantiteModifie = click.target.closest(".itemQuantity");
+/**
+ * Modifie la quantité d'un proudit dans le panier à partir du changement d'un input
+ */
+function updateProductQuantity(click) {
+    let searchedProduct = click.target.closest("article");
+    let modifiedQuantity = click.target.closest(".itemQuantity");
 
     // On filtre le produit en fonction de son id et sa couleur dans le localStorage et puis on remplace sa quantité
-    let produitTrouve = cartItems.find(
+    let foundProduct = cartItems.find(
         (article) =>
-            article.id == produitCible.dataset.id &&
-            article.couleur == produitCible.dataset.color
+            article.id == searchedProduct.dataset.id &&
+            article.color == searchedProduct.dataset.color
     );
-    let nouvelleQuantite = parseInt(quantiteModifie.value);
-    produitTrouve.quantite = nouvelleQuantite;
-    localStorage.setItem("produits", JSON.stringify(cartItems));
+    let updateQuantity = parseInt(modifiedQuantity.value);
+    foundProduct.quantity = updateQuantity;
+    localStorage.setItem("products", JSON.stringify(cartItems));
     window.location.reload();
     //collecteDonneesAPI();
 }
 
-// Fonction pour vérifier la validité des textes envoyés dans le formulaire
-function validerTexte(textToValidate, text) {
+/**
+ * Vérifie la validité ou conformité des textes envoyés dans le formulaire
+ * @param { String } textToValidate
+ * @param { String } text
+ */
+function checkText(textToValidate, text) {
     //Définitions de la reg exp pour les textes
-    const texteRegExp = new RegExp("^[A-Za-z-_ ]{3,30}$", "g");
+    const textRegExp = new RegExp("^[A-Za-z-_ ]{3,30}$", "g");
 
     //Récupération de l'élement du DOM pour contenir le message d'erreur
-    const messageErreur = textToValidate.nextElementSibling;
+    const errorMessage = textToValidate.nextElementSibling;
 
     // Vérification du contenu du texte
-    if (texteRegExp.test(textToValidate.value)) {
-        messageErreur.textContent = "";
+    if (textRegExp.test(textToValidate.value)) {
+        errorMessage.textContent = "";
         return true;
     } else {
-        messageErreur.textContent = `Format ${text} pas valide`;
+        errorMessage.textContent = `Format ${text} pas valide`;
         return false;
     }
 }
 
-// Fonction pour vérifier la validité de l'adresse envoyée dans le formulaire
-function validerAdresse(textToValidate, text) {
+/**
+ * Vérifie la conformité en nombre de caractères max des adresses envoyés dans le formulaire
+ * @param { String {..40} } adressToValidate
+ * @param { String } text
+ */
+function checkAdress(adressToValidate, text) {
     //Récupération de l'élement du DOM pour contenir le message d'erreur
-    const messageErreur = textToValidate.nextElementSibling;
+    const errorMessage = adressToValidate.nextElementSibling;
 
     // Vérification de la quantité de caractères du texte
-    if (textToValidate.value.length < 40) {
-        messageErreur.textContent = "";
+    if (adressToValidate.value.length < 40) {
+        errorMessage.textContent = "";
         return true;
     } else {
-        messageErreur.textContent = `${text} est trop longue (plus de 40 caractères)`;
+        errorMessage.textContent = `${text} est trop longue (plus de 40 caractères)`;
         return false;
     }
 }
 
-// Fonction pour vérifier la validité du email envoyé dans le formulaire
-function validerEmail(emailToValidate) {
+/**
+ * Vérifie la validité ou conformité des textes envoyés dans le formulaire
+ * @param { String {..40} } emailToValidate
+ * @param { String } text
+ */
+function checkEmail(emailToValidate) {
     //Définiton de la reg exp pour les emails
     const emailRegExp = new RegExp(
         "^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$",
@@ -216,122 +244,125 @@ function validerEmail(emailToValidate) {
     );
 
     //Récupération de l'élement du DOM pour contenir le message d'erreur
-    const messageErreur = emailToValidate.nextElementSibling;
+    const errorMessage = emailToValidate.nextElementSibling;
 
     // Vérification du contenu du email
     if (emailRegExp.test(emailToValidate.value)) {
-        messageErreur.textContent = "";
+        errorMessage.textContent = "";
         return true;
     } else {
-        messageErreur.textContent = `Format ${emailToValidate.id} pas valide`;
+        errorMessage.textContent = `Format ${emailToValidate.id} pas valide`;
         return false;
     }
 }
 
-function passerCommande() {
+/**
+ * Passe la commande et renvoi l'utilisateur vers la page de confirmation
+ */
+function placeOrder() {
     //Encerrer la fonction s'il n'y a aps d'articles dans le panier
     if (cartItems == null) {
         return;
     }
 
     //Récupération de l'élement formulaire dans le DOM
-    const formCommande = document.querySelector(".cart__order__form");
+    const orderForm = document.querySelector(".cart__order__form");
 
     //------- DEBUT : Gestion de la validité du contenu du formulaire -------//
 
     //----Contrôle du prénom
     //Récuperation du imput Prénom
-    const lePrenom = formCommande.firstName;
-    lePrenom.addEventListener("change", function () {
+    const firstName = orderForm.firstName;
+    firstName.addEventListener("change", function () {
         //Appel de la fonction de validation
-        validerTexte(this, "du Prénom");
+        checkText(this, "du Prénom");
     });
 
     //----Contrôle du nom
     //Récuperation du imput Nom
-    const leNom = formCommande.lastName;
+    const lastName = orderForm.lastName;
 
-    leNom.addEventListener("change", function () {
+    lastName.addEventListener("change", function () {
         //Appel de la fonction de validation
-        validerTexte(this, "du Nom");
+        checkText(this, "du Nom");
     });
 
     //----Contrôle de l'adresse'
     //Récuperation du imput Ville
-    const lAdresse = formCommande.address;
+    const adress = orderForm.address;
 
-    lAdresse.addEventListener("change", function () {
+    adress.addEventListener("change", function () {
         //Appel de la fonction de validation
-        validerAdresse(this, "L'adresse");
+        checkAdress(this, "L'adresse");
     });
 
     //----Contrôle de la Ville
     //Récuperation du imput Ville
-    const laVille = formCommande.city;
+    const city = orderForm.city;
 
-    laVille.addEventListener("change", function () {
+    city.addEventListener("change", function () {
         //Appel de la fonction de validation
-        validerTexte(this, "de la Ville");
+        checkText(this, "de la Ville");
     });
 
     //----Contrôle du email
     //Récuperation du imput Email
-    const leMail = formCommande.email;
+    const email = orderForm.email;
 
-    leMail.addEventListener("change", function () {
+    email.addEventListener("change", function () {
         //Appel de la fonction de validation
-        validerEmail(this, "du Mail");
+        checkEmail(this, "du Mail");
     });
 
     //------- FIN : Gestion de la validité du contenu du formulaire -------//
 
     //Evenemment lorsqu'on clique sur le boutton commander
-    formCommande.order.addEventListener("click", (click) => {
+    orderForm.order.addEventListener("click", (click) => {
         click.preventDefault();
 
         const orderId = [];
-        for (let produit of cartItems) {
-            orderId.push(produit.id);
+        for (let product of cartItems) {
+            orderId.push(product.id);
         }
-        console.log(orderId);
+        //console.log(orderId);
 
         // Création du objet avec els infos pour la commande
-        const nouvelleCommande = {
+        const newOrder = {
             contact: {
-                firstName: formCommande.firstName.value,
-                lastName: formCommande.lastName.value,
-                address: formCommande.address.value,
-                city: formCommande.city.value,
-                email: formCommande.email.value,
+                firstName: orderForm.firstName.value,
+                lastName: orderForm.lastName.value,
+                address: orderForm.address.value,
+                city: orderForm.city.value,
+                email: orderForm.email.value,
             },
             products: orderId,
         };
 
         //Gestion de la validation du formulaire
         if (
-            validerTexte(lePrenom) &&
-            validerTexte(leNom) &&
-            validerTexte(laVille) &&
-            validerEmail(leMail) &&
-            nouvelleCommande.products.length > 0
+            checkText(firstName) &&
+            checkText(lastName) &&
+            checkText(city) &&
+            checkEmail(email) &&
+            newOrder.products.length > 0
         ) {
             // La definition du corps pour la méthode Fetch Post pour le stockage de la commande
-            let optionsFetch = {
+            let fetchBody = {
                 method: "POST",
-                body: JSON.stringify(nouvelleCommande),
+                body: JSON.stringify(newOrder),
                 headers: {
                     "Content-Type": "application/json",
                 },
             };
 
-            fetch("http://localhost:3000/api/products/order", optionsFetch)
+            fetch("http://localhost:3000/api/products/order", fetchBody)
                 .then((response) => {
                     return response.json();
                 })
-                .then((commander) => {
-                    console.log(commander.orderId);
-                    window.localStorage.clear("produits");
-                    document.location.href = `./confirmation.html?orderId=${commander.orderId}`;
+                .then((toOrder) => {
+                    //console.log(toOrder.orderId);
+                    window.localStorage.clear("products");
+                    document.location.href = `./confirmation.html?orderId=${toOrder.orderId}`;
                 })
                 .catch((error) => {
                     alert(
@@ -346,4 +377,4 @@ function passerCommande() {
 }
 
 datafromAPI();
-passerCommande();
+placeOrder();
