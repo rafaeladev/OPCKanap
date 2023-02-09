@@ -21,8 +21,8 @@ console when the server starts, e.g. `Listening on port 3001`.
 ### Skills assesed in this project
 
 <ul>
-    <li>Create a test plan for an application</li>
-    <li>Handle JavaScript events</li>
-    <li>Interact with a web service (API) with JavaScript</li>
-    <li>Validate data from external sources</li>
+    <li>Create a 'test plan' for an application</li>
+    <li>Handle 'JavaScript events'</li>
+    <li>Interact with a 'web service (API)' with JavaScript</li>
+    <li>'Validate data' from external sources</li>
 </ul>
