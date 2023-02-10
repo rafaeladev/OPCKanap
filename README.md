@@ -4,7 +4,7 @@
 
 This is the **front end and back end** server for **Project 5** of the **Web Developer path** from **[OpenClassrooms](https://openclassrooms.com/fr/)**.
 
-<img src="./front/images/banniere.png" alt="Logo kanap" width="800" height="344">
+<img src="./front/images/banniere.png" alt="Banner kanap" width="800" height="344">
 
 > **Back end Prerequisites**
 
@@ -22,3 +22,5 @@ The server should run on `localhost` with default port `3000`. If the server run
 -   [x] Handle **JavaScript events**
 -   [x] Interact with a **web service (API)** with JavaScript
 -   [x] **Validate data** from external sources
+
+<img src="./gif/mobile.gif" alt="Gif mobile">
