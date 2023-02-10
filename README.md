@@ -23,4 +23,4 @@ The server should run on `localhost` with default port `3000`. If the server run
 -   [x] Interact with a **web service (API)** with JavaScript
 -   [x] **Validate data** from external sources
 
-<img src="./gif/mobile.gif" alt="Gif mobile">
+<img src="./gif/mobile.png" alt="Gif mobile">
