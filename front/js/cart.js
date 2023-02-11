@@ -185,7 +185,7 @@ function updateProductQuantity(click) {
     );
     let updateQuantity = parseInt(modifiedQuantity.value);
     if (updateQuantity > 100 || updateQuantity < 1) {
-        alert("La quantité doit êter comprise entre 1 et 100");
+        alert("La quantité doit être comprise entre 1 et 100");
         window.location.reload();
     } else {
         foundProduct.quantity = updateQuantity;
