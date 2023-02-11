@@ -91,6 +91,10 @@ function addToCart() {
                     localStorageProducts[i].quantity += parseInt(
                         addProductToCart.quantity
                     );
+                    if (localStorageProducts[i].quantity > 100) {
+                        alert("Limite maximale de 100 unités dépassée");
+                        return;
+                    }
                     localStorageProducts = JSON.stringify(localStorageProducts);
                     localStorage.setItem("products", localStorageProducts);
                     alert("Produit ajouté au Panier");

@@ -102,7 +102,7 @@ function showProductInCart(apiArticle, localStorageArticle) {
     //Settings
     const canapSettings = document.createElement("div");
     canapSettings.className = "cart__item__content__settings";
-    articleItem.appendChild(canapSettings);
+    canapContent.appendChild(canapSettings);
 
     //Quantité
     const canapQuantity = document.createElement("div");
@@ -184,10 +184,15 @@ function updateProductQuantity(click) {
             article.color == searchedProduct.dataset.color
     );
     let updateQuantity = parseInt(modifiedQuantity.value);
-    foundProduct.quantity = updateQuantity;
-    localStorage.setItem("products", JSON.stringify(cartItems));
-    window.location.reload();
-    //collecteDonneesAPI();
+    if (updateQuantity > 100 || updateQuantity < 1) {
+        alert("La quantité doit êter comprise entre 1 et 100");
+        window.location.reload();
+    } else {
+        foundProduct.quantity = updateQuantity;
+        localStorage.setItem("products", JSON.stringify(cartItems));
+        window.location.reload();
+        //collecteDonneesAPI();
+    }
 }
 
 /**
@@ -199,15 +204,18 @@ function checkText(textToValidate, text) {
     //Définitions de la reg exp pour les textes
     const textRegExp = new RegExp("^[A-Za-z-_ ]{3,30}$", "g");
 
+    //On eleve les spaces du string
+    const newString = textToValidate.value.trim();
+
     //Récupération de l'élement du DOM pour contenir le message d'erreur
     const errorMessage = textToValidate.nextElementSibling;
 
     // Vérification du contenu du texte
-    if (textRegExp.test(textToValidate.value)) {
-        errorMessage.textContent = "";
+    if (textRegExp.test(newString)) {
+        errorMessage.textContent = ``;
         return true;
     } else {
-        errorMessage.textContent = `Format ${text} pas valide`;
+        errorMessage.textContent = `Format ${text} invalide`;
         return false;
     }
 }
@@ -221,13 +229,17 @@ function checkAdress(adressToValidate, text) {
     //Récupération de l'élement du DOM pour contenir le message d'erreur
     const errorMessage = adressToValidate.nextElementSibling;
 
+    //On eleve les spaces du string
+    const newString = adressToValidate.value.trim();
+
     // Vérification de la quantité de caractères du texte
-    if (adressToValidate.value.length < 40) {
-        errorMessage.textContent = "";
-        return true;
-    } else {
-        errorMessage.textContent = `${text} est trop longue (plus de 40 caractères)`;
+    // On remplace les " " et on compte le nombre de caractères
+    if (newString.length > 50 || !newString.replace(/\s/g, "").length) {
+        errorMessage.textContent = `${text} est invalide`;
         return false;
+    } else {
+        errorMessage.textContent = ``;
+        return true;
     }
 }
 
@@ -238,20 +250,19 @@ function checkAdress(adressToValidate, text) {
  */
 function checkEmail(emailToValidate) {
     //Définiton de la reg exp pour les emails
-    const emailRegExp = new RegExp(
-        "^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$",
-        "g"
-    );
+    const emailRegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
     //Récupération de l'élement du DOM pour contenir le message d'erreur
     const errorMessage = emailToValidate.nextElementSibling;
+    //On eleve les spaces du string
+    const newString = emailToValidate.value.trim();
 
     // Vérification du contenu du email
-    if (emailRegExp.test(emailToValidate.value)) {
-        errorMessage.textContent = "";
+    if (emailRegExp.test(newString)) {
+        errorMessage.textContent = ``;
         return true;
     } else {
-        errorMessage.textContent = `Format ${emailToValidate.id} pas valide`;
+        errorMessage.textContent = `Format ${emailToValidate.id} invalide`;
         return false;
     }
 }
